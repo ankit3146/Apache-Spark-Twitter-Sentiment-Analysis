@@ -18,7 +18,7 @@ def getSparkSessionInstance(sparkConf):
     return globals()['sparkSessionSingletonInstance']
 
 
-def convtoDataframe(rdd):
+def convtoDataframeAndApplyModel(rdd):
     spark = getSparkSessionInstance(rdd.context.getConf())
     rowRdd = rdd.map(lambda w: Tweet(w))
     df = spark.createDataFrame(rowRdd)
@@ -39,7 +39,7 @@ lines = socket_stream.window(20)
 lines.count().map(lambda x:'Tweets in this batch: %s' % x).pprint()
 # If we want to filter hashtags only
 lines.filter( lambda word: word.lower().startswith("#") )
-lines.foreachRDD(lambda rdd: convtoDataframe(rdd))
+lines.foreachRDD(lambda rdd: convtoDataframeAndApplyModel(rdd))
 
 ssc.start()
 ssc.awaitTermination()
